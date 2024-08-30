@@ -1,0 +1,61 @@
+const Blog = require("../model/blog");
+
+const blog_index = (req, res) => {
+  Blog.find()
+    .sort({ createdAt: -1 })
+    .then((result) => {
+      res.render("index", { title: "All Blogs", blogs: result });
+      // console.log(result)
+    })
+    .catch((err) => {
+      console.log("error in --> /blogs");
+      console.log(err);
+    });
+};
+
+const blog_details = (req, res) => {
+  const id = req.params.id;
+  console.log("id", id);
+
+  Blog.findById(id)
+    .then((result) => {
+      res.render("details", { blog: result, title: "Blog Details" });
+      // console.log(result);
+    })
+    .catch((err) => {
+        res.status(404).render("404", { title: "404" });
+    //   console.log(err);
+    });
+};
+
+const blog_create_get = (req, res) => {
+  res.render("create", { title: "Create" });
+};
+
+const blog_create_post = (req, res) => {
+  // console.log(req.body)
+  const blog = new Blog(req.body);
+  blog.save()
+    .then((result) => {
+      res.redirect("/blogs");
+    })
+    .catch((err) => console.log(err));
+};
+
+const blog_delete = (req, res) => {
+  const id = req.params.id;
+
+  Blog.findByIdAndDelete(id)
+    .then(() => {
+      res.json({ redirect: "/" });
+    })
+    .catch((err) => console.log(err));
+};
+
+module.exports = {
+  blog_index,
+  blog_details,
+  blog_create_get,
+  blog_create_post,
+  blog_delete,
+};
